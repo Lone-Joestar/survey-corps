@@ -1,0 +1,25 @@
+services:
+  spark-master:
+    image: apache/spark:3.5.1
+    container_name: survey-corps-spark-master
+    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.master.Master"]
+    ports:
+      - "9090:8080"   # Spark's own master UI runs on 8080 internally — remapped, since 8080/8081 are both already claimed
+      - "7077:7077"   # master's RPC port, workers connect here
+    volumes:
+      - ${SPARK_PROJ_DIR}/data:/opt/spark-data
+      - ${SPARK_PROJ_DIR}/spark_jobs:/opt/spark-jobs
+
+
+  spark-worker:
+    image: apache/spark:3.5.1
+    container_name: survey-corps-spark-worker
+    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.worker.Worker", "spark://spark-master:7077"]
+    depends_on:
+      - spark-master
+    ports:
+      - "8082:8081"   # worker's UI, also remapped to avoid clashing with your Airflow instance on 8081
+    volumes:
+      - ${SPARK_PROJ_DIR}/data:/opt/spark-data
+      - ${SPARK_PROJ_DIR}/spark_jobs:/opt/spark-jobs
+

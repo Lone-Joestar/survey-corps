@@ -1,0 +1,16 @@
+services:
+  warehouse-postgres:
+    image: postgres:16
+    container_name: survey-corps-warehouse
+    environment:
+      POSTGRES_USER: warehouse
+      POSTGRES_PASSWORD: warehouse
+      POSTGRES_DB: survey_corps
+    ports:
+     - "5433:5432"
+    
+    volumes:
+     - warehouse_data:/var/lib/postgresql/data
+volumes:
+  warehouse_data:
+      
